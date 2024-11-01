@@ -48,6 +48,19 @@ This will then allow the ping function to work.
  
 *Note! We can also put a `[db]` group to specify database dervers.*
  
+
+ Here is how I've reconfigured the hosts file to connect to the db ec2:
+ ```bash
+[db]
+# where the db servers will go
+ec2-db-instance ansible_host=172.31.60.115 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/tech264-ilhaan-aws-key.pem
+ ```
+- this should be the result when you run the `ansible all -m ping` command, you should get a response from both machines
+
+ ![alt text](image.png)
+
+<br>
+
 8. To put these in a parent group, we set them up like so:
  
 ```
