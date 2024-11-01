@@ -4,6 +4,7 @@
     - [***ansible controller ec2***](#ansible-controller-ec2)
     - [***target node app ec2***](#target-node-app-ec2)
   - [***Next Steps***](#next-steps)
+  - [***Create a playbook to provision the app vm***](#create-a-playbook-to-provision-the-app-vm)
 
 ## ***Create an ansible controller and app ec2 instance***
 ### ***ansible controller ec2***
@@ -82,3 +83,12 @@ This means we could ping the `test` group and get responses from all their child
 ```
  
 11. We can use `ansible-playbook install_nginx.yaml` to activate the playbook. This should mean that `nginx` is installed and running.
+
+
+## ***Create a playbook to provision the app vm***
+
+1.  create a YAML file named `prov_app_with_npm.yaml` in your `/etc/ansible/` directory
+2.  Use modules to ensure idempotency, meaning there are no unwanted side effects due to repeated executions
+3.  We want to create a script that installs NodeJS and NPM install as well as clones your `tech264-sparta-app` github repo
+4.  this [script](./prov_app_with_npm_start.yaml) describes the code I used to copy the github repo and get the app running on port 3000 with nodejs
+5.  this [script](./prov_app_with_pm2.yaml) descirbes the same but with pm2 instead of npm

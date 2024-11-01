@@ -1,0 +1,17 @@
+---
+#name of the play:
+
+- name: install nginx play
+ # where (which devices?) run this playbook
+  hosts: web
+  # get comprehensive facts on the hosts
+  gather_facts: yes
+  # do we need to provide admin access
+  become: true
+
+  # instructions for the play which are known as "tasks"
+  # task 1 - install ngnix on targer node
+  tasks:
+  - name: install and configure nginx
+    # use package 'nginx', 'state=present' means we need it running
+    apt: pkg=nginx state=present
