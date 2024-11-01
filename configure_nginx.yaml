@@ -5,7 +5,7 @@
   gather_facts: no            # Skip gathering system facts to speed up execution
 
   tasks:
-  
+
     # Update the apt repository and cache
     - name: Update apt repository and cache
       apt:
@@ -23,6 +23,13 @@
       apt:
         name: nodejs              # Specifies the 'nodejs' package
         state: present            # Ensures Node.js is installed
+
+    # Install PM2 globally using npm
+    - name: Install PM2
+      npm:
+        name: pm2                 # Specifies the 'pm2' package
+        global: yes               # Install pm2 globally
+        state: present            # Ensures pm2 is installed
 
     # Clone the application repository to the Ansible controller node (local machine)
     - name: Clone the app repository to the controller node
@@ -45,9 +52,35 @@
         path: /home/ubuntu/repo/app/  # Directory where the package.json is located
       # Installs npm dependencies required for the application
 
-    # Start the application using npm start command
-    - name: Start the application using npm
-      ansible.builtin.shell: npm start
+    # Install NGINX web server
+    - name: Install NGINX
+      apt:
+        name: nginx               # Specifies the 'nginx' package
+        state: present            # Ensures nginx is installed
+
+    # Configure NGINX to act as a reverse proxy to forward requests to the Node.js app
+    - name: Configure NGINX to act as a reverse proxy
+      ansible.builtin.shell: |
+        sudo sed -i 's|try_files $uri $uri/ =404;|proxy_pass http://localhost:3000;|' /etc/nginx/sites-available/default
+      # Modifies the default NGINX configuration file to proxy traffic to the app on port 3000
+
+    # Restart NGINX to apply the updated configuration
+    - name: Restart NGINX to apply configuration
+      service:
+        name: nginx               # Specifies the 'nginx' service
+        state: restarted          # Restarts nginx to load the new configuration
+
+    # Start the Node.js application using pm2
+    - name: Start the application using pm2
+      ansible.builtin.shell: |
+        pm2 start app.js 
       args:
         chdir: /home/ubuntu/repo/app/  # Sets the working directory to the application folder
-      # Runs the application by executing 'npm start' inside the specified directory
+
+    # Ensure the application is running with pm2; start if not already running
+    - name: Start the application using pm2 if not already running
+      shell: |
+        if ! pm2 list | grep -q "app"; then
+          pm2 start app.js
+        fi
+      # Checks if the application is already running; starts it if not

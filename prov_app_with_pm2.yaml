@@ -1,51 +1,61 @@
----
+# Main playbook to provision a Node.js application
 - name: Provision Node.js application
-  hosts: web
-  become: yes
-  gather_facts: no
+  hosts: web                  # Target hosts group named 'web'
+  become: yes                 # Run tasks with elevated privileges (sudo)
+  gather_facts: no            # Skip gathering system facts to speed up execution
 
   tasks:
-  - name: Update apt repository and cache
-    apt:
-      update_cache: yes
-      force_apt_get: yes
-      cache_valid_time: 3600
+  
+    # Update the apt repository and cache
+    - name: Update apt repository and cache
+      apt:
+        update_cache: yes         # Update the local apt cache
+        force_apt_get: yes        # Use apt-get even if apt is available
+        cache_valid_time: 3600    # Cache validity duration (in seconds) for apt cache
 
-  - name: Install NodeSource Node.js 20.x repository
-    ansible.builtin.shell: |
-      curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+    # Add NodeSource repository for Node.js version 20.x
+    - name: Install NodeSource Node.js 20.x repository
+      ansible.builtin.shell: curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+      # Executes a shell command to add the Node.js 20.x repository to the system
 
-  - name: Install Node.js and npm
-    apt:
-      name:
-        - nodejs
-      state: present
+    # Install Node.js and npm from the apt repository
+    - name: Install Node.js and npm
+      apt:
+        name:
+          - nodejs               # Specifies the 'nodejs' package
+        state: present           # Ensures Node.js is installed
 
-  - name: Install PM2
-    npm:
-      name: pm2
-      global: yes
-      state: present
+    # Install PM2 globally using npm
+    - name: Install PM2
+      npm:
+        name: pm2                # Specifies the 'pm2' package
+        global: yes              # Install pm2 globally
+        state: present           # Ensures pm2 is installed
 
-  - name: Clone the app repository to the controller node
-    delegate_to: localhost
-    ansible.builtin.git:
-      repo: 'https://github.com/IlhaanHasssan/tech264-sparta-app.git'
-      dest: /home/ubuntu/repo
-      version: main
+    # Clone the application repository to the Ansible controller node (local machine)
+    - name: Clone the app repository to the controller node
+      delegate_to: localhost      # Executes this task on the localhost (Ansible controller)
+      ansible.builtin.git:
+        repo: 'https://github.com/IlhaanHasssan/tech264-sparta-app.git'  # Git repository URL
+        dest: /home/ubuntu/repo   # Destination directory for cloning the repository
+        version: main             # Specifies the branch to clone (main branch)
 
-  - name: Copy app folder to target node
-    ansible.builtin.copy:
-      src: /home/ubuntu/repo/
-      dest: /home/ubuntu/repo/
-      mode: '0755'
+    # Copy the cloned application folder from the controller to the target node
+    - name: Copy app folder to target node
+      ansible.builtin.copy:
+        src: /home/ubuntu/repo/   # Source directory on the controller
+        dest: /home/ubuntu/repo/  # Destination directory on the target node
+        mode: '0755'              # Sets permissions to read, write, and execute for owner; read and execute for others
 
-  - name: Install packages based on package.json
-    community.general.npm:
-      path: /home/ubuntu/repo/app/
+    # Install npm packages based on the package.json file in the application folder
+    - name: Install packages based on package.json
+      community.general.npm:
+        path: /home/ubuntu/repo/app/  # Directory where the package.json is located
+      # Installs npm dependencies required for the application
 
-  - name: Start the application using pm2
-    ansible.builtin.shell:
-    pm2 start app.js
-    args:
-      chdir: /home/ubuntu/repo/app/
+    # Start the application using pm2
+    - name: Start the application using pm2
+      ansible.builtin.shell: pm2 start app.js          
+      args:
+        chdir: /home/ubuntu/repo/app/  # Sets the working directory to the application folder
+      # Starts the app in the specified directory using pm2

@@ -1,20 +1,20 @@
 # ***ANSIBLE***
 - [***ANSIBLE***](#ansible)
   - [***Create an ansible controller and app ec2 instance***](#create-an-ansible-controller-and-app-ec2-instance)
-    - [***ansible controller ec2***](#ansible-controller-ec2)
-    - [***target node app ec2***](#target-node-app-ec2)
+    - [***Ansible controller ec2***](#ansible-controller-ec2)
+    - [***Target node app ec2***](#target-node-app-ec2)
   - [***Next Steps***](#next-steps)
   - [***Create a playbook to provision the app vm***](#create-a-playbook-to-provision-the-app-vm)
 
 ## ***Create an ansible controller and app ec2 instance***
-### ***ansible controller ec2***
+### ***Ansible controller ec2***
 1. go to the aws portal and create an ec2 instance with the name `tech264-ilhaan-ubuntu-2204-ansible-controller`
 2. Use Ubuntu Pro 22.04 
 3. Enable the SSH port
 4. Use your existing aws key
 5. No need to run any scripts or user data
 
-### ***target node app ec2***
+### ***Target node app ec2***
 1. go to the aws portal and create an ec2 instance with the name `tech264-ilhaan-ubuntu-2204-ansbile-target-node-app`
 2. Use Ubuntu Pro 22.04 
 3. Enable the SSH, HTTP & port 3000
@@ -81,8 +81,8 @@ This means we could ping the `test` group and get responses from all their child
     # Use "nginx" package // "state=present" means we need it running
     apt: pkg=nginx state=present
 ```
- 
-11. We can use `ansible-playbook install_nginx.yaml` to activate the playbook. This should mean that `nginx` is installed and running.
+   - [install nginx script](./install_nginx.yaml) can be edited here
+1.  We can use `ansible-playbook install_nginx.yaml` to activate the playbook. This should mean that `nginx` is installed and running.
 
 
 ## ***Create a playbook to provision the app vm***
@@ -91,4 +91,6 @@ This means we could ping the `test` group and get responses from all their child
 2.  Use modules to ensure idempotency, meaning there are no unwanted side effects due to repeated executions
 3.  We want to create a script that installs NodeJS and NPM install as well as clones your `tech264-sparta-app` github repo
 4.  this [script](./prov_app_with_npm_start.yaml) describes the code I used to copy the github repo and get the app running on port 3000 with nodejs
-5.  this [script](./prov_app_with_pm2.yaml) descirbes the same but with pm2 instead of npm
+5.  create a YAML file with the name `prov_app_with_pm2.yaml` in the same directory
+6.  this [script](./prov_app_with_pm2.yaml) descirbes the same but with pm2 instead of npm
+7.  edit the [script](./configure_nginx.yaml) so that it configures nginx reverse proxy so the app runs on port 80 instead of port 3000
