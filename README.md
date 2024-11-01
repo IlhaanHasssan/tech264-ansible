@@ -2,7 +2,8 @@
 - [***ANSIBLE***](#ansible)
   - [***Create an ansible controller and app ec2 instance***](#create-an-ansible-controller-and-app-ec2-instance)
     - [***Ansible controller ec2***](#ansible-controller-ec2)
-    - [***Target node app ec2***](#target-node-app-ec2)
+    - [***Target node app EC2***](#target-node-app-ec2)
+    - [***DB EC2 instance***](#db-ec2-instance)
   - [***Next Steps***](#next-steps)
   - [***Create a playbook to provision the app vm***](#create-a-playbook-to-provision-the-app-vm)
 
@@ -14,14 +15,21 @@
 4. Use your existing aws key
 5. No need to run any scripts or user data
 
-### ***Target node app ec2***
-1. go to the aws portal and create an ec2 instance with the name `tech264-ilhaan-ubuntu-2204-ansbile-target-node-app`
+### ***Target node app EC2***
+1. go to the aws portal and create an ec2 instance with the name `tech264-ilhaan-ubuntu-2204-ansible-target-node-app`
 2. Use Ubuntu Pro 22.04 
 3. Enable the SSH, HTTP & port 3000
 4. Use your existing aws key, the same one you used for the controller
 5. No need to run any scripts or user data
 
-- check you can ssh into both machines
+### ***DB EC2 instance***
+1. go to the aws portal and create an ec2 instance with the name `tech264-ilhaan-ubuntu-2204-ansible-node-db`
+2. Use Ubuntu Pro 22.04 
+3. Enable the SSH
+4. Use your existing aws key, the same one you used for the controller
+5. No need to run any scripts or user data
+
+- check you can ssh into all the machines
 
 ## ***Next Steps***
  
