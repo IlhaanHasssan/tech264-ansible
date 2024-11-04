@@ -1,5 +1,10 @@
 ---
 # Master playbook to run database and application provisioning playbooks
+- name: Install Nginx playbook
+  import_playbook: install_nginx.yaml
+
+- name: Install MongoDB
+  import_playbook: install_mongodb.yaml
 
 - name: Run database provisioning playbook
   import_playbook: prov-db.yaml

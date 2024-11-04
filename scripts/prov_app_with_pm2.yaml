@@ -95,3 +95,6 @@
         if ! pm2 list | grep -q "app"; then
           pm2 start app.js
         fi
+      args:
+        chdir: /home/ubuntu/repo/app/
+      # Checks if the application is already running; starts it if not
