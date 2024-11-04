@@ -8,8 +8,8 @@
   - [***Use Ad-Hoc command to transfer key to target node***](#use-ad-hoc-command-to-transfer-key-to-target-node)
   - [***Create a playbook to provision the app and db EC2 instances***](#create-a-playbook-to-provision-the-app-and-db-ec2-instances)
   - [***Copying a file using the copy module***](#copying-a-file-using-the-copy-module)
-    - [***Possible blockers***](#possible-blockers)
   - [***Create a master playbook***](#create-a-master-playbook)
+    - [***Possible blockers***](#possible-blockers)
 
 ## ***Create an ansible controller and app ec2 instance***
 ### ***Ansible Controller EC2***
@@ -146,6 +146,7 @@ sudo -E npm install
 ![alt text](image-2.png)
 
 <br>
+
 ## ***Copying a file using the copy module***
 ```yaml
 ---
@@ -159,12 +160,16 @@ sudo -E npm install
 ```
 
 
+## ***Create a master playbook***
+1. Import your two working playbooks and run them in a master-playbook made and named `sudo nano master-playbook.yaml`
+2. Find the [script](./scripts/master-playbook.yaml)
+
 
 ### ***Possible blockers***
 -  ensure you are using the correct **aws key** from your **ssh folder**
 - make sure the variable name **`ansible_ssh_private_key_file`**
 - specify the correct **nodejs** version (version 20)
-
-## ***Create a master playbook***
-1. Import your two working playbooks and run them in a master-playbook made and named `sudo nano master-playbook.yaml`
-2. Find the [script](./scripts/master-playbook.yaml)
+- using the below means you need to use sudo priveleges throughtout
+```yaml
+become: true
+```
