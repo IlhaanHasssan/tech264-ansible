@@ -104,7 +104,7 @@ This means we could ping the **`test`** group and get responses from all their c
   # First Task: Install nginx on the Target Node
   tasks:
   - name: install and configure nginx
-    # Use "nginx" package // "state=present" means we need it running
+    # Use "nginx" package // "state=present" means we are checking that is it downloaded
     apt: pkg=nginx state=present
 ```
    - **[install nginx script](./install_nginx.yaml)** can be edited here
@@ -116,11 +116,11 @@ ansible ec2-app-instance -m ansible.builtin.copy -a "src=~/.ssh/tech264-name-aws
 ```
 
   - ec2-app-instance: The name of your target node in your Ansible inventory. 
-  - `-m ansible.builtin.copy`: Specifies the copy module from the ansible.builtin collection.
-  - `-a "src=~/.ssh/tech264-name-aws-key.pem dest=/home/ubuntu/.ssh/tech264-name-aws-key.pem mode=0600"`:
-    - src: Path to the private key on the Ansible controller.
-    - dest: Full path on the target node where the key will be copied.
-    - mode=0400`: Sets secure file permissions so that only the owner can read the file.
+  - **`-m ansible.builtin.copy`**: Specifies the copy module from the ansible.builtin collection.
+  - **`-a "src=~/.ssh/tech264-name-aws-key.pem dest=/home/ubuntu/.ssh/tech264-name-aws-key.pem mode=0600"`**:
+    - **`src`**: Path to the private key on the Ansible controller.
+    - **`dest`**: Full path on the target node where the key will be copied.
+    - **`mode=0400`**: Sets secure file permissions so that only the owner can read the file.
 
 
 ## ***Create a playbook to provision the app and db EC2 instances***
@@ -162,7 +162,7 @@ sudo -E npm install
 
 ## ***Create a master playbook***
 1. Import your two working playbooks and run them in a master-playbook made and named `sudo nano master-playbook.yaml`
-2. Find the [script](./scripts/master-playbook.yaml) here
+2. Find the **[script](./scripts/master-playbook.yaml)** here
 
 
 ### ***Possible blockers***
