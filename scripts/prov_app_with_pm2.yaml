@@ -5,6 +5,9 @@
   become: yes                 # Run tasks with elevated privileges (sudo)
   gather_facts: no            # Skip gathering system facts to speed up execution
 
+  environment:
+    DB_HOST: mongodb://172.31.28.168:27017
+
   tasks:
     # Update the apt repository and cache
     - name: Update apt repository and cache
@@ -41,12 +44,12 @@
         version: main               # Specifies the branch to clone (main branch)
 
     # Set DB_HOST environment variable
-    - name: Set DB_HOST environment variable
-      ansible.builtin.lineinfile:
-        path: /etc/environment       # Path to the environment file
-        regexp: '^DB_HOST='          # Regex to find existing DB_HOST entry
-        line: 'DB_HOST=mongodb://172.31.25.66:27017' # New DB_HOST value, should be db private IP
-        state: present               # Ensures the line is present
+ #   - name: Set DB_HOST environment variable
+ #     ansible.builtin.lineinfile:
+ #       path: /etc/environment       # Path to the environment file
+ #       regexp: '^DB_HOST='          # Regex to find existing DB_HOST entry
+ #       line: 'DB_HOST=mongodb://172.31.25.66:27017' # New DB_HOST value, should be db private IP
+ #       state: present               # Ensures the line is present
 
     # Source environment variables to make them available
     - name: Source environment variables
@@ -93,7 +96,7 @@
     - name: Start the application using pm2 if not already running
       shell: |
         if ! pm2 list | grep -q "app.js"; then
-         -E pm2 start app.js
+          pm2 start app.js --update-env
         fi
       args:
         chdir: /home/ubuntu/repo/app/
