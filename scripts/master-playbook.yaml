@@ -1,0 +1,8 @@
+---
+# Master playbook to run database and application provisioning playbooks
+
+- name: Run database provisioning playbook
+  import_playbook: prov-db.yaml
+
+- name: Run application provisioning playbook
+  import_playbook: prov_app_with_npm_start.yaml

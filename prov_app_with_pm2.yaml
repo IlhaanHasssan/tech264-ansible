@@ -15,7 +15,8 @@
 
     # Add NodeSource repository for Node.js version 20.x
     - name: Install NodeSource Node.js 20.x repository
-      ansible.builtin.shell: curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+      ansible.builtin.shell: |
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
       # Executes a shell command to add the Node.js 20.x repository to the system
 
     # Install Node.js and npm from the apt repository
@@ -55,7 +56,8 @@
 
     # Start the application using pm2
     - name: Start the application using pm2
-      ansible.builtin.shell: pm2 start app.js          
+      ansible.builtin.shell: |
+        pm2 start app.js          
       args:
         chdir: /home/ubuntu/repo/app/  # Sets the working directory to the application folder
       # Starts the app in the specified directory using pm2

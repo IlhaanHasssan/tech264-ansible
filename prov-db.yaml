@@ -1,0 +1,22 @@
+---
+- name: configure database mongo db + app with one script
+  hosts: db
+  gather_facts: yes
+  become: true
+ 
+  tasks:
+ 
+  - name: update bind IP using lineinfile module
+    ansible.builtin.lineinfile:
+      path: "/etc/mongod.conf"
+      search_string: '127.0.0.1'
+      line: "  bindIp: 0.0.0.0"
+      state: present
+ 
+  - name: Ensure MongoDB is enabled and started
+    ansible.builtin.service:
+      name: mongod
+      enabled: yes
+      state: started
+
+

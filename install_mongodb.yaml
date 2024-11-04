@@ -1,0 +1,36 @@
+---
+# Playbook to install MongoDB in database EC2 instance
+# Where to install the DB
+- hosts: db
+  gather_facts: yes
+  become: true
+  tasks:
+    - name: Import the MongoDB public key
+      ansible.builtin.apt_key:
+        url: https://www.mongodb.org/static/pgp/server-7.0.asc
+        state: present
+
+    - name: Add the MongoDB repository
+      ansible.builtin.apt_repository:
+        repo: "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu {{ ansible_distribution_release }}/mongodb-org/7.0 multiverse"
+        state: present
+        update_cache: yes
+
+    - name: Install MongoDB 7.0.6
+      ansible.builtin.apt:
+        name: mongodb-org=7.0.6
+        state: present
+        update_cache: yes
+
+      - name: update bind IP using lineinfile module
+        ansible.builtin.lineinfile:
+          path: "/etc/mongod.conf"
+          search_string: '127.0.0.1'
+          line: "  bindIp: 0.0.0.0"
+          state: present
+
+    - name: Ensure MongoDB service is started and enabled
+      service:
+        name: mongod
+        state: started
+        enabled: yes
