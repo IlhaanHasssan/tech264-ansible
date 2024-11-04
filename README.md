@@ -116,11 +116,11 @@ ansible ec2-app-instance -m ansible.builtin.copy -a "src=~/.ssh/tech264-name-aws
 ```
 
   - ec2-app-instance: The name of your target node in your Ansible inventory. 
-  - `-m ansible.builtin.copy: Specifies the copy module from the ansible.builtin collection.
-  - -a "src=~/.ssh/tech264-name-aws-key.pem dest=/home/ubuntu/.ssh/tech264-name-aws-key.pem mode=0600":
-  - src: Path to the private key on the Ansible controller.
-  - dest: Full path on the target node where the key will be copied.
-  - mode=0400`: Sets secure file permissions so that only the owner can read the file.
+  - `-m ansible.builtin.copy`: Specifies the copy module from the ansible.builtin collection.
+  - `-a "src=~/.ssh/tech264-name-aws-key.pem dest=/home/ubuntu/.ssh/tech264-name-aws-key.pem mode=0600"`:
+    - src: Path to the private key on the Ansible controller.
+    - dest: Full path on the target node where the key will be copied.
+    - mode=0400`: Sets secure file permissions so that only the owner can read the file.
 
 
 ## ***Create a playbook to provision the app and db EC2 instances***
@@ -129,18 +129,18 @@ ansible ec2-app-instance -m ansible.builtin.copy -a "src=~/.ssh/tech264-name-aws
 2.  Use modules to ensure idempotency, meaning there are no unwanted side effects due to repeated executions
 3.  We want to create a script that installs NodeJS and NPM install as well as clones your **`tech264-sparta-app`** github repo
 4.  this **[script](./prov_app_with_npm_start.yaml)** describes the code I used to copy the github repo and get the app running on port 3000 with nodejs
-5.  create a YAML file with the name **`prov_app_with_pm2.yaml`**in the same directory
+5.  create a YAML file with the name **`prov_app_with_pm2.yaml`** in the same directory
 6.  this **[script](./prov_app_with_pm2.yaml)** descirbes the same but with pm2 instead of npm
 7.  edit the **[script](./configure_nginx.yaml)** so that it configures nginx reverse proxy so the app runs on port 80 instead of port 3000
-8.  Check the bindIP has been configured using `ansible db  -a "grep 'bindIp' /etc/mongod.conf".`
+8.  Check the bindIP has been configured using **`ansible db  -a "grep 'bindIp' /etc/mongod.conf"`**
 9.  On the App VM, manually create an ENV VAR DB_HOST. Check it's been made and restart the app.
 10. In the app target node:
 ```bash
 export DB_HOST="mongodb://{DBPRIVATEIP}:27017/posts"
-cd app
+cd repo/app
 sudo -E npm install
 ```
-1.  you should now be connected to your mongodb database, check if the script is running correctly by using **`ansible db -a "sudo systemctl status mongod"`**
+11.  you should now be connected to your mongodb database, check if the script is running correctly by using **`ansible db -a "sudo systemctl status mongod"`**
 <br>
 
 ![alt text](image-2.png)
@@ -162,14 +162,14 @@ sudo -E npm install
 
 ## ***Create a master playbook***
 1. Import your two working playbooks and run them in a master-playbook made and named `sudo nano master-playbook.yaml`
-2. Find the [script](./scripts/master-playbook.yaml)
+2. Find the [script](./scripts/master-playbook.yaml) here
 
 
 ### ***Possible blockers***
 -  ensure you are using the correct **aws key** from your **ssh folder**
 - make sure the variable name **`ansible_ssh_private_key_file`**
 - specify the correct **nodejs** version (version 20)
-- using the below means you need to use sudo priveleges throughout
+- using the below command means you need to use sudo priveleges throughout
 ```yaml
 become: true
 ```
