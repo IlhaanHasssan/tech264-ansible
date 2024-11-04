@@ -70,10 +70,9 @@
         name: nginx               # Specifies the 'nginx' service
         state: restarted          # Restarts nginx to load the new configuration
 
-    # Stop any processes running before starting the Node.js application using pm2
-    - name: Start the application using pm2
-      ansible.builtin.shell: |
-        pm2 stop all 
+    - name: Stop all PM2 processes (if any are running)
+      ansible.builtin.shell: pm2 stop all || true
+      ignore_errors: yes        
       args:
         chdir: /home/ubuntu/repo/app/  # Sets the working directory to the application folder
 
