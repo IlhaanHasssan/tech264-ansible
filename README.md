@@ -1,6 +1,6 @@
 # ***ANSIBLE***
 - [***ANSIBLE***](#ansible)
-  - [***Create an ansible controller and app ec2 instance***](#create-an-ansible-controller-and-app-ec2-instance)
+  - [***Create an ansible controller and app \& db ec2 instance***](#create-an-ansible-controller-and-app--db-ec2-instance)
     - [***Ansible Controller EC2***](#ansible-controller-ec2)
     - [***Target Node -  App EC2***](#target-node----app-ec2)
     - [***Database EC2***](#database-ec2)
@@ -11,7 +11,7 @@
   - [***Create a master playbook***](#create-a-master-playbook)
     - [***Possible blockers***](#possible-blockers)
 
-## ***Create an ansible controller and app ec2 instance***
+## ***Create an ansible controller and app & db ec2 instance***
 ### ***Ansible Controller EC2***
 1. go to the aws portal and create an ec2 instance with the name `tech264-ilhaan-ubuntu-2204-ansible-controller`
 2. Use Ubuntu Pro 22.04 
@@ -169,7 +169,7 @@ sudo -E npm install
 -  ensure you are using the correct **aws key** from your **ssh folder**
 - make sure the variable name **`ansible_ssh_private_key_file`**
 - specify the correct **nodejs** version (version 20)
-- using the below means you need to use sudo priveleges throughtout
+- using the below means you need to use sudo priveleges throughout
 ```yaml
 become: true
 ```
