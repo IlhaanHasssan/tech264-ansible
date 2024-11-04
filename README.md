@@ -136,11 +136,16 @@ ansible ec2-app-instance -m ansible.builtin.copy -a "src=~/.ssh/tech264-name-aws
 9.  On the App VM, manually create an ENV VAR DB_HOST. Check it's been made and restart the app.
 10. In the app target node:
 ```bash
-export DB_HOST="mongodb://172.31.23.151:27017/posts"
+export DB_HOST="mongodb://{DBPRIVATEIP}:27017/posts"
 cd app
 sudo -E npm install
 ```
+1.  you should now be connected to your mongodb database, check if the script is running correctly by using **`ansible db -a "sudo systemctl status mongod"`**
+<br>
 
+![alt text](image-2.png)
+
+<br>
 ## ***Copying a file using the copy module***
 ```yaml
 ---
