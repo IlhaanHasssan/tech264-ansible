@@ -13,21 +13,21 @@
 
 ## ***Create an ansible controller and app & db ec2 instance***
 ### ***Ansible Controller EC2***
-1. go to the aws portal and create an ec2 instance with the name `tech264-ilhaan-ubuntu-2204-ansible-controller`
+1. go to the aws portal and create an ec2 instance with the name **`tech264-ilhaan-ubuntu-2204-ansible-controller`**
 2. Use Ubuntu Pro 22.04 
 3. Enable the SSH port
 4. Use your existing aws key
 5. No need to run any scripts or user data
 ---
 ### ***Target Node -  App EC2***
-1. go to the aws portal and create an ec2 instance with the name `tech264-ilhaan-ubuntu-2204-ansible-target-node-app`
+1. go to the aws portal and create an ec2 instance with the name **`tech264-ilhaan-ubuntu-2204-ansible-target-node-app`**
 2. Use Ubuntu Pro 22.04 
 3. Enable the SSH, HTTP & port 3000
 4. Use your existing aws key, the same one you used for the controller
 5. No need to run any scripts or user data
 ---
 ### ***Database EC2***
-1. go to the aws portal and create an ec2 instance with the name `tech264-ilhaan-ubuntu-2204-ansible-node-db`
+1. go to the aws portal and create an ec2 instance with the name **`tech264-ilhaan-ubuntu-2204-ansible-node-db`**
 2. Use Ubuntu Pro 22.04 
 3. Enable the SSH
 4. Use your existing aws key, the same one you used for the controller
@@ -37,11 +37,11 @@
 
 ## ***Next Steps***
  
-1. When they're both created, we `update` and `upgrade` both of our VMs.
-2. Go to the controller VM window and insert the command `sudo apt-add-repository ppa:ansible/ansible` to install the ansible repo, followed by `sudo apt install ansible -y`.
+1. When they're both created, we **`sudo apt-get update -y`** and **`sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y`** both of our VMs.
+2. Go to the controller VM window and insert the command **`sudo apt-add-repository ppa:ansible/ansible`** to install the ansible repo, followed by **`sudo apt install ansible -y`**
 3. Check the version for clarity.
-4. CD into `/etc/ansible` folder.
-5. Use `ansible all -m ping` to ping all the machines that Ansible knows to communicate with. If there are none, use `sudo nano hosts` once in the `/etc/ansible` directory to add some.
+4. CD into **`/etc/ansible`** folder.
+5. Use **`ansible all -m ping`** to ping all the machines that Ansible knows to communicate with. If there are none, use **`sudo nano hosts`** once in the **`/etc/ansible`** directory to add some.
 6. Add this to the top of the file:
  
 ```yaml
@@ -125,22 +125,24 @@ ansible ec2-app-instance -m ansible.builtin.copy -a "src=~/.ssh/tech264-name-aws
 
 ## ***Create a playbook to provision the app and db EC2 instances***
 
-1.  create a YAML file named **`prov_app_with_npm.yaml`** in your **`/etc/ansible/`** directory
+1.  create a **YAML** file named **`prov_app_with_npm.yaml`** in your **`/etc/ansible/`** directory
 2.  Use modules to ensure idempotency, meaning there are no unwanted side effects due to repeated executions
 3.  We want to create a script that installs NodeJS and NPM install as well as clones your **`tech264-sparta-app`** github repo
-4.  this **[script](./prov_app_with_npm_start.yaml)** describes the code I used to copy the github repo and get the app running on port 3000 with nodejs
+4.  this **[script](./scripts/prov_app_with_npm_start.yaml)** describes the code I used to copy the github repo and get the app running on port 3000 with nodejs
 5.  create a YAML file with the name **`prov_app_with_pm2.yaml`** in the same directory
-6.  this **[script](./prov_app_with_pm2.yaml)** descirbes the same but with pm2 instead of npm
-7.  edit the **[script](./configure_nginx.yaml)** so that it configures nginx reverse proxy so the app runs on port 80 instead of port 3000
-8.  Check the bindIP has been configured using **`ansible db  -a "grep 'bindIp' /etc/mongod.conf"`**
-9.  On the App VM, manually create an ENV VAR DB_HOST. Check it's been made and restart the app.
-10. In the app target node:
+6.  this **[script](./scripts/prov_app_with_pm2.yaml)** descirbes the same but with pm2 instead of npm
+7.  edit the **[script](./scripts/configure_nginx.yaml)** so that it configures nginx reverse proxy so the app runs on port 80 instead of port 3000, add this to the script that provisions the app
+8.  This **[script](./scripts/install_mongodb.yaml)** downloads and runs mongodb on the database ec2
+9.  create a [script](./scripts/prov-db.yaml) to provision the database ec2 instance
+10. Check the bindIP has been configured using **`ansible db  -a "grep 'bindIp' /etc/mongod.conf"`**
+11. On the App VM, manually create an ENV VAR DB_HOST. Check it's been made and restart the app.
+12. In the app target node:
 ```bash
 export DB_HOST="mongodb://{DBPRIVATEIP}:27017/posts"
 cd repo/app
 sudo -E npm install
 ```
-11.  you should now be connected to your mongodb database, check if the script is running correctly by using **`ansible db -a "sudo systemctl status mongod"`**
+13.   you should now be connected to your mongodb database, check if the script is running correctly by using **`ansible db -a "sudo systemctl status mongod"`**
 <br>
 
 ![alt text](image-2.png)
@@ -166,7 +168,7 @@ sudo -E npm install
 
 
 ### ***Possible blockers***
--  ensure you are using the correct **aws key** from your **ssh folder**
+-  ensure you are using the correct **aws key** from your **/.ssh folder**
 - make sure the variable name **`ansible_ssh_private_key_file`**
 - specify the correct **nodejs** version (version 20)
 - using the below command means you need to use sudo priveleges throughout

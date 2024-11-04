@@ -1,0 +1,97 @@
+---
+# Main playbook to provision a Node.js application
+- name: Provision Node.js application
+  hosts: web                  # Target hosts group named 'web'
+  become: yes                 # Run tasks with elevated privileges (sudo)
+  gather_facts: no            # Skip gathering system facts to speed up execution
+
+  tasks:
+    # Update the apt repository and cache
+    - name: Update apt repository and cache
+      apt:
+        update_cache: yes         # Update the local apt cache
+        force_apt_get: yes        # Use apt-get even if apt is available
+        cache_valid_time: 3600    # Cache validity duration (in seconds) for apt cache
+
+    # Add NodeSource repository for Node.js version 20.x
+    - name: Install NodeSource Node.js 20.x repository
+      ansible.builtin.shell: |
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+      # Executes a shell command to add the Node.js 20.x repository to the system
+
+    # Install Node.js and npm from the apt repository
+    - name: Install Node.js and npm
+      apt:
+        name: nodejs               # Specifies the 'nodejs' package
+        state: present             # Ensures Node.js is installed
+
+    # Install PM2 globally using npm
+    - name: Install PM2
+      npm:
+        name: pm2                  # Specifies the 'pm2' package
+        global: yes                # Install pm2 globally
+        state: present             # Ensures pm2 is installed
+
+    # Clone the application repository to the Ansible controller node (local machine)
+    - name: Clone the app repository to the controller node
+      delegate_to: localhost        # Executes this task on the localhost (Ansible controller)
+      ansible.builtin.git:
+        repo: 'https://github.com/IlhaanHasssan/tech264-sparta-app.git'  # Git repository URL
+        dest: /home/ubuntu/repo     # Destination directory for cloning the repository
+        version: main               # Specifies the branch to clone (main branch)
+
+    # Set DB_HOST environment variable
+    - name: Set DB_HOST environment variable
+      ansible.builtin.lineinfile:
+        path: /etc/environment       # Path to the environment file
+        regexp: '^DB_HOST='          # Regex to find existing DB_HOST entry
+        line: 'DB_HOST=mongodb://172.31.23.188:27017' # New DB_HOST value, should be db private IP
+        state: present               # Ensures the line is present
+
+    # Source environment variables to make them available
+    - name: Source environment variables
+      ansible.builtin.shell: "bash -c 'source /etc/environment'"
+
+    # Copy the cloned application folder from the controller to the target node
+    - name: Copy app folder to target node
+      ansible.builtin.copy:
+        src: /home/ubuntu/repo/      # Source directory on the controller
+        dest: /home/ubuntu/repo/     # Destination directory on the target node
+        mode: '0755'                 # Sets permissions to read, write, and execute for owner; read and execute for others
+
+    # Install npm packages based on the package.json file in the application folder
+    - name: Install packages based on package.json
+      community.general.npm:
+        path: /home/ubuntu/repo/app/  # Directory where the package.json is located
+      # Installs npm dependencies required for the application
+
+    # Install NGINX web server
+    - name: Install NGINX
+      apt:
+        name: nginx                 # Specifies the 'nginx' package
+        state: present              # Ensures NGINX is installed
+
+    # Configure NGINX to act as a reverse proxy for the Node.js application
+    - name: Configure NGINX to act as a reverse proxy
+      ansible.builtin.shell: |
+        sudo sed -i 's|try_files $uri $uri/ =404;|proxy_pass http://localhost:3000;|' /etc/nginx/sites-available/default
+      # Modifies NGINX default site configuration to forward traffic to the Node.js app
+
+    # Restart NGINX to apply configuration changes
+    - name: Restart NGINX to apply configuration
+      service:
+        name: nginx
+        state: restarted            # Ensures NGINX is restarted
+
+    # Start the application using pm2
+    - name: Start the application using pm2
+      ansible.builtin.shell: pm2 start app.js
+      args:
+        chdir: /home/ubuntu/repo/app/  # Sets the working directory to the application folder
+
+    # Start the application using pm2 only if it's not already running
+    - name: Start the application using pm2 if not already running
+      shell: |
+        if ! pm2 list | grep -q "app"; then
+          pm2 start app.js
+        fi
